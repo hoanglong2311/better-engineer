@@ -7,41 +7,58 @@ summary: 'Building Highly Available Solutions with AWS: Data Durability and Reco
 ---
 
 Workshop Overview:
-Data durability and recovery are critical aspects of any modern cloud infrastructure. 
-In this workshop, you will learn how to create highly available solutions using Amazon Web Services (AWS) to ensure the resilience of your data. 
-We will focus on building a Multi-AvailabilityZone, Multi-Region database, and a versioned website hosting solution to mitigate data loss and accidents. 
+Data durability and recovery are critical aspects of any modern cloud infrastructure.
+In this workshop, you will learn how to create highly available solutions using Amazon Web Services (AWS) to ensure the resilience of your data.
+We will focus on building a Multi-AvailabilityZone, Multi-Region database, and a versioned website hosting solution to mitigate data loss and accidents.
 By the end of this workshop, you will have the skills to architect and deploy robust AWS solutions that can withstand failures and disasters.
 
 <TOCInline toc={props.toc} exclude="Introduction" />
 
 ## Workshop Agenda:
+
 1. Introduction to Data Durability and Recovery in AWS
-    Understanding the importance of data durability and recovery
-    Overview of AWS services for building highly available solutions
+   Understanding the importance of data durability and recovery
+   Overview of AWS services for building highly available solutions
 2. Building a Multi-AvailabilityZone, Multi-Region Database
-    Setting up Amazon RDS (Relational Database Service) for multi-AvailabilityZone deployment
-    Configuring cross-region replication for data redundancy and disaster recovery
+   Setting up Amazon RDS (Relational Database Service) for multi-AvailabilityZone deployment
+   Configuring cross-region replication for data redundancy and disaster recovery
 3. Demonstrating failover and recovery scenarios across multiple AWS regions
-    Implementing Versioned Website Hosting Solution
-    Setting up Amazon S3 (Simple Storage Service) for static website hosting
-    Configuring versioning for S3 buckets to enable easy rollback in case of accidental data deletion or corruption
-    Integrating Amazon CloudFront for global content delivery and improved website performance
+   Implementing Versioned Website Hosting Solution
+   Setting up Amazon S3 (Simple Storage Service) for static website hosting
+   Configuring versioning for S3 buckets to enable easy rollback in case of accidental data deletion or corruption
+   Integrating Amazon CloudFront for global content delivery and improved website performance
 4. Hands-on Lab: Building and Testing Highly Available Solutions
-    Participants will follow step-by-step instructions to deploy a multi-AvailabilityZone, multi-Region database and versioned website hosting solution on AWS
-    Guided exercises to simulate failure scenarios and practice recovery procedures
+   Participants will follow step-by-step instructions to deploy a multi-AvailabilityZone, multi-Region database and versioned website hosting solution on AWS
+   Guided exercises to simulate failure scenarios and practice recovery procedures
 5. Best Practices and Advanced Considerations
-    Discussing best practices for designing resilient architectures in AWS
-    Exploring advanced features and services for enhancing data durability and recovery, such as AWS Backup, AWS Disaster Recovery, etc.
+   Discussing best practices for designing resilient architectures in AWS
+   Exploring advanced features and services for enhancing data durability and recovery, such as AWS Backup, AWS Disaster Recovery, etc.
 
 ## Introduction AWS Cloud Formation
 
 AWS CloudFormation lets you model, provision, and manage AWS and third-party resources by treating infrastructure as code.
 
 <div className="-mx-2 flex flex-wrap overflow-hidden xl:-mx-2">
-  <div className="my-2 w-full overflow-hidden px-2 xl:my-2 xl:w-1 xl:px-2">
+  <div className="my-1 w-full overflow-hidden px-2 xl:my-2 xl:px-2">
     ![Maple](/static/images/blog_material/fcj_workshop1/cloudformation.png)
   </div>
 </div>
+
+In this project we will create, define the infrastructure by code, just like you do with software development.
+This can bring a lot of benefits of being able to manage infrastructure, share infrastructure in a common language.
+
+CloudFormation use as a configuration file, written by YAML language.
+In this project I will create infrastructure by CloudFormation:
+
+- VPC
+- Two private subnets, two public subnets
+- Route tables for public and private subnets, and associate the route tables with the subnets.
+- Two security groups, one for the application and other for the database
+- An Internet Gateway
+
+You can see the diagram below.
+
+images: ['/static/images/canada/mountains.jpg']
 
 ## Part 1: Data Durability And Recovery
 
@@ -69,7 +86,5 @@ for index, fibonacci_number in zip(range(10), fib()):
 ```
 
 ## Part 2: Failover And Recovery
-
-
 
 ## Part 3: Web Resiliency
