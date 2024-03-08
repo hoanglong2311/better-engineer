@@ -4,7 +4,11 @@ date: '2024-03-1'
 tags: ['linux', 'code', 'AWS']
 draft: false
 summary: 'Building Highly Available Solutions with AWS: Data Durability and Recovery.'
+layout: PostSimple
+bibliography: references-data.bib
 ---
+
+## Overview
 
 Workshop Overview:
 Data durability and recovery are critical aspects of any modern cloud infrastructure.
@@ -12,7 +16,7 @@ In this workshop, you will learn how to create highly available solutions using 
 We will focus on building a Multi-AvailabilityZone, Multi-Region database, and a versioned website hosting solution to mitigate data loss and accidents.
 By the end of this workshop, you will have the skills to architect and deploy robust AWS solutions that can withstand failures and disasters.
 
-<TOCInline toc={props.toc} exclude="Introduction" />
+<TOCInline toc={props.toc} exclude="Overview" toHeading={2} />
 
 ## Workshop Agenda:
 
@@ -58,49 +62,63 @@ In this project I will create infrastructure by CloudFormation:
 
 You can see the diagram below.
 
-
 ## Part 1: Data Durability And Recovery
 
 To build a VPC from the YAML file, follow the steps. Here are the steps to follow in the AWS console.
 
-<div className="">
-  <div className="my-1 w-full overflow-hidden px-2 xl:my-2 xl:px-2">
-    ![Maple](/static/images/blog_material/fcj_workshop1/test.png)
+<div className="text-center">
+  <div className="">
+    <img
+      alt="Maple"
+      src="/static/images/blog_material/fcj_workshop1/with_new_resources(standard).png"
+    />
+  </div>
+</div>
+
+<div className="text-center">
+  <div className="">
+    <img alt="Maple" src="/static/images/blog_material/fcj_workshop1/test2.png" />
+  </div>
+</div>
+
+<div className="text-center">
+  <div className="">
+    <img alt="Maple" src="/static/images/blog_material/fcj_workshop1/upload_vpc_yaml.png" />
   </div>
 </div>
 
 VPC.yaml
 
 ```yaml
-Description: Design for Availability, Resilience, and Reliability
+Description: AWS(FCJ workshop1) Design for Availability, Resilience, and Reliability
 
 Parameters:
   VpcName:
-    Description: A name that is prefixed to resource names
+    Description: VPC for project
     Type: String
 
   VpcCIDR:
-    Description: Please enter the IP range (CIDR notation) for this VPC
+    Description: IP range (CIDR notation) for this VPC
     Type: String
     Default: 10.1.0.0/16
 
   PublicSubnet1CIDR:
-    Description: Please enter the IP range (CIDR notation) for the public subnet in the first Availability Zone
+    Description: IP range (CIDR notation) for the public subnet in the first Availability Zone
     Type: String
     Default: 10.1.10.0/24
 
   PublicSubnet2CIDR:
-    Description: Please enter the IP range (CIDR notation) for the public subnet in the second Availability Zone
+    Description: IP range (CIDR notation) for the public subnet in the second Availability Zone
     Type: String
     Default: 10.1.11.0/24
 
   PrivateSubnet1CIDR:
-    Description: Please enter the IP range (CIDR notation) for the private subnet in the first Availability Zone
+    Description: IP range (CIDR notation) for the private subnet in the first Availability Zone
     Type: String
     Default: 10.1.20.0/24
 
   PrivateSubnet2CIDR:
-    Description: Please enter the IP range (CIDR notation) for the private subnet in the second Availability Zone
+    Description: IP range (CIDR notation) for the private subnet in the second Availability Zone
     Type: String
     Default: 10.1.21.0/24
 
