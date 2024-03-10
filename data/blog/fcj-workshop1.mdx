@@ -66,6 +66,8 @@ You can see the diagram below.
 
 To build a VPC from the YAML file, follow the steps. Here are the steps to follow in the AWS console.
 
+We run Cloudformation for both region us-east-1 as Primary and us-west-2 as Secondary (failover) region.
+
 <div className="text-center">
   <div className="">
     <img
@@ -88,6 +90,10 @@ To build a VPC from the YAML file, follow the steps. Here are the steps to follo
 </div>
 
 VPC.yaml
+
+<a href="../blog/material/fcj_ws1/vpc.yaml" download>
+  vpc.yaml
+</a>
 
 ```yaml
 Description: AWS(FCJ workshop1) Design for Availability, Resilience, and Reliability
@@ -314,6 +320,55 @@ Outputs:
     Description: ID of the EC2 instance security group
     Value: !Ref ApplicationSecurityGroup
 ```
+
+1. Services -> CloudFormation
+2. Create stack “With new resources (standard)”
+3. Template is ready
+4. Upload a template file
+5. Click “Choose file” button
+6. Select provided YAML file
+7. Next
+8. Fill in Stack name, for example, fcj-project1-stack for the Primary and fcj-project1-stack-secondary for the Secondary stack.
+9. Name the VPC. You'll want to name the primary VPC "Primary" and the secondary VPC "Secondary".
+10. Update the CIDR blocks to match the architecture diagram above - you only need to do it in the secondary region
+11. Click Next
+12. Next again
+13. Click Submit
+14. Wait for the stack to build out. Refresh until status becomes “CREATE_COMPLETE”
+15. Observe the “Outputs” tab for the created IDs. These will be used later.
+
+<div className="text-center">
+  <div className="">
+    <img
+      alt="Maple"
+      src="/static/images/blog_material/fcj_workshop1/cloudFormationCreateDone.png"
+    />
+  </div>
+</div>
+
+We can see all the output of running cloudformation.
+
+<div className="text-center">
+  <div className="">
+    <img alt="Maple" src="/static/images/blog_material/fcj_workshop1/output_cloudfomation.png" />
+  </div>
+</div>
+
+VPC in Primary region
+
+<div className="text-center">
+  <div className="">
+    <img alt="Maple" src="/static/images/blog_material/fcj_workshop1/primary_Vpc.png" />
+  </div>
+</div>
+
+PRIMARY SUBNET ROUTING
+
+<div className="text-center">
+  <div className="">
+    <img alt="Maple" src="/static/images/blog_material/fcj_workshop1/primary_subnet_routing.png" />
+  </div>
+</div>
 
 ## Part 2: Failover And Recovery
 

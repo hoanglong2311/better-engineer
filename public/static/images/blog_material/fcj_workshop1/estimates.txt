@@ -1,0 +1,18 @@
+1. Minimum RTO for a single AZ outage 
+In case an AZ is stopped and cannot operate anymore, the system must immediately and seamlessly switch to another replacement AZ. And this conversion process can take anywhere from a few minutes.
+    
+2. Minimum RTO for a single region outage
+In a scenario involving an outage within a single region, the timeline unfolds as follows:
+
+- Let's say it happened at 08:00 (0 minutes).
+- After a maximum period of 5 minutes, the alarm will be activated and a notification will be sent at 08:05 (5 minutes).
+- Then it takes 1 minute to notify all employees before 08:06 (1 minute)
+- In order for the administrator to log into the system and diagnose the problem, the estimated time for that is 35 minutes from 08:16 to 08:41.
+- After determining the cause of the problem, the process of resolving and recovering the problem is completed. This process takes about 14 minutes ending at 08:60.
+- And the total expected resolution time for the above incident to occur is 60 minutes
+
+3. Minimum RPO for a single AZ outage
+In the event of an AZ outage, the transition to a backup system takes only a few minutes and may result in a small amount of data generated during that time frame being lost.     
+    
+4. Minimum RPO for a single region outage 
+The RPO for a region's outage depends on the frequency of data backups. If the RDS database is configured to perform automatic backups every 4 hours, the minimum RPO will be set to 4 hours. This implies that, in the worst case, if the system is inoperable for 4 hours, all data for 4 hours will be lost.
