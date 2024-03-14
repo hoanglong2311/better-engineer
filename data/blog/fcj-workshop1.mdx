@@ -321,6 +321,11 @@ Outputs:
     Value: !Ref ApplicationSecurityGroup
 ```
 
+### A. Data Durability And Recovery
+
+Pick two AWS regions. An active region and a standby region ( us-east-1 and us-west-2 regions )
+Use CloudFormation to create one VPC in each region. Name the VPC in the active region "Primary" and name the VPC in the standby region "Secondary".
+
 1. Services -> CloudFormation
 2. Create stack “With new resources (standard)”
 3. Template is ready
@@ -354,7 +359,7 @@ We can see all the output of running cloudformation.
   </div>
 </div>
 
-VPC in Primary region
+VPC in Primary region - us-east-1
 
 <div className="text-center">
   <div className="">
@@ -367,6 +372,62 @@ PRIMARY SUBNET ROUTING
 <div className="text-center">
   <div className="">
     <img alt="Maple" src="/static/images/blog_material/fcj_workshop1/primary_subnet_routing.png" />
+  </div>
+</div>
+
+VPC in Secondary region us-west-2
+
+<div className="text-center">
+  <div className="">
+    <img alt="Maple" src="/static/images/blog_material/fcj_workshop1/secondary_Vpc.png" />
+  </div>
+</div>
+
+SECONDARY SUBNET ROUTING
+
+<div className="text-center">
+  <div className="">
+    <img
+      alt="Maple"
+      src="/static/images/blog_material/fcj_workshop1/secondary_subnet_routing.png"
+    />
+  </div>
+</div>
+
+### B.Highly resilient RDS Database
+
+1. Establish a new RDS Subnet group in both the primary and secondary regions utilizing private subnets.
+
+<div className="text-center">
+  <div className="">
+    <img alt="Maple" src="/static/images/blog_material/fcj_workshop1/primaryDB_subnetgroup.png" />
+  </div>
+</div>
+
+2. Create a new MySQL, multi-AZ database in the active region. The database must:
+   - Be a “burstable” instance class.
+   - Have only the “UDARR-Database” security group.
+   - Have an initial database called “udacity.”
+
+<div className="text-center">
+  <div className="">
+    <img alt="Maple" src="/static/images/blog_material/fcj_workshop1/primaryDB_config.png" />
+  </div>
+</div>
+
+3. Create a read replica database in the standby region. This database has the same requirements as the database in the active region.
+
+### In secondary region
+
+<div className="text-center">
+  <div className="">
+    <img alt="Maple" src="/static/images/blog_material/fcj_workshop1/secondaryDB_subnetgroup.png" />
+  </div>
+</div>
+
+<div className="text-center">
+  <div className="">
+    <img alt="Maple" src="/static/images/blog_material/fcj_workshop1/secondaryDB_config.png" />
   </div>
 </div>
 
