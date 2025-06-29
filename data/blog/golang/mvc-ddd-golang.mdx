@@ -1,0 +1,686 @@
+---
+title: 'MVC vs DDD: Go Language Architecture Deep Dive'
+date: '2025-06-29'
+tags: ['linux', 'code', 'AWS', 'golang']
+draft: false
+summary: 'A detailed comparison of Go language MVC and DDD layered architectures, exploring their differences, directory structures, code implementations, and practical applications for backend development.'
+layout: PostSimple
+bibliography: references-data.bib
+---
+
+## Overview
+
+MVC and DDD are two popular layered architectural concepts in backend development. MVC (Model-View-Controller) is a design pattern mainly used to separate user interface, business logic, and data models for easier decoupling and layering, while DDD (Domain-Driven Design) is an architectural methodology aimed at solving design and maintenance difficulties in complex systems by building business domain models.
+
+In the Java ecosystem, many systems have gradually transitioned from MVC to DDD. However, in languages like Go, Python, and NodeJS—which advocate simplicity and efficiency—MVC remains the mainstream architecture. Below, we will specifically discuss the differences in directory structure between MVC and DDD based on Go language.
+
+## MVC Diagram Structure
+
+```
++------------------+
+|      View        | User Interface Layer: responsible for data display and user interaction (such as HTML pages, API responses)
++------------------+
+|   Controller     | Controller Layer: processes user requests, calls Service logic, coordinates Model and View
++------------------+
+|      Model       | Model Layer: contains data objects (such as database table structures) and some business logic (often scattered in Service layer)
++------------------+
+```
+
+## DDD Diagram Structure
+
+```
++--------------------+
+|   User Interface   | Responsible for user interaction and display (such as REST API, Web interface)
++--------------------+
+| Application Layer  | Orchestrates business processes (such as calling domain services, transaction management), does not contain core business rules
++--------------------+
+|   Domain Layer     | Core business logic layer: contains aggregate roots, entities, value objects, domain services, etc., encapsulates business rules
++--------------------+
+| Infrastructure     | Provides technical implementations (such as database access, message queues, external APIs)
++--------------------+
+```
+
+## Main Differences Between MVC and DDD
+
+### 1. Code Organization Logic
+- **MVC** layers by technical function (Controller/Service/DAO), focusing on technical implementation.
+- **DDD** divides modules by business domain (such as order domain, payment domain), isolating core business logic through bounded contexts.
+
+### 2. Carrier of Business Logic
+- **MVC** usually adopts an anemic model, separating data (Model) and behavior (Service), which leads to high maintenance cost due to dispersed logic.
+- **DDD** achieves a rich model through aggregate roots and domain services, concentrating business logic in the domain layer and enhancing scalability.
+
+### 3. Applicability and Cost
+- **MVC** has a low development cost and is suitable for small to medium systems with stable requirements.
+- **DDD** requires upfront domain modeling and a unified language, making it suitable for large systems with complex business and long-term evolution needs, but the team must have domain abstraction capabilities.
+
+## Go Language MVC Directory Structure
+
+MVC is mainly divided into three layers: view, controller, and model.
+
+```
+gin-order/
+├── cmd
+│   └── main.go                  # Application entry point, starts the Gin engine
+├── internal
+│   ├── controllers              # Controller layer (handles HTTP requests), also known as handlers
+│   │   └── order
+│   │       └── order_controller.go  # Controller for the Order module
+│   ├── services                 # Service layer (handles business logic)
+│   │   └── order
+│   │       └── order_service.go       # Service implementation for the Order module
+│   ├── repository               # Data access layer (interacts with the database)
+│   │   └── order
+│   │       └── order_repository.go    # Data access interface and implementation for Order module
+│   ├── models                   # Model layer (data structure definitions)
+│   │   └── order
+│   │       └── order.go               # Data model for the Order module
+│   ├── middleware               # Middleware (such as authentication, logging, request interception)
+│   │   ├── logging.go             # Logging middleware
+│   │   └── auth.go                # Authentication middleware
+│   └── config                   # Configuration module (database, server configurations, etc.)
+│       └── config.go                # Application and environment configurations
+├── pkg                          # Common utility packages (such as response wrappers)
+│   └── response.go              # Response handling utility methods
+├── web                          # Frontend resources (templates and static assets)
+│   ├── static                   # Static resources (CSS, JS, images)
+│   └── templates                # Template files (HTML templates)
+│       └── order.tmpl           # View template for the Order module (if rendering HTML is needed)
+├── go.mod                       # Go module management file
+└── go.sum                       # Go module dependency lock file
+```
+
+## Go Language DDD Directory Structure
+
+DDD is mainly divided into four layers: interface, application, domain, and infrastructure.
+
+```
+go-web/
+│── cmd/
+│   └── main.go               # Application entry point
+│── internal/
+│   ├── application/          # Application layer (coordinates domain logic, handles use cases)
+│   │   ├── services/         # Service layer, business logic directory
+│   │   │   └── order_service.go # Order application service, calls domain layer business logic
+│   ├── domain/               # Domain layer (core business logic and interface definitions)
+│   │   ├── order/            # Order aggregate
+│   │   │   ├── order.go      # Order entity (aggregate root), contains core business logic
+│   │   ├── repository/       # General repository interfaces
+│   │   │   ├── repository.go # General repository interface (CRUD operations)
+│   │   │   └── order_repository.go # Order repository interface, defines operations on order data
+│   ├── infrastructure/       # Infrastructure layer (implements interfaces defined in the domain layer)
+│   │   ├── repository/       # Repository implementation
+│   │   │   └── order_repository_impl.go  # Order repository implementation, concrete order data storage
+│   └── interfaces/           # Interface layer (handles external requests, such as HTTP interfaces)
+│   │   ├── handlers/         # HTTP handlers
+│   │   │  └── order_handler.go # HTTP handler for orders
+│   │   └── routes/
+│   │   │   ├── router.go     # Base router utility setup
+│   │   │   └── order-routes.go # Order routes configuration
+│   │   │   └── order-routes-test.go # Order routes test
+│   │   │   └── order-routes-test.go # Order routes test
+│   └── middleware/           # Middleware (e.g.: authentication, interception, authorization, etc.)
+│   │   └── logging.go        # Logging middleware
+│   ├── config/               # Service-related configuration
+│   │   └── server_config.go  # Server configuration (e.g., port, timeout settings, etc.)
+│── pkg/                      # Reusable public libraries
+│   └── utils/                # Utility classes (e.g.: logging, date handling, etc.)
+```
+
+## Go Language MVC Code Implementation
+
+The flow follows: `Controller (Interface Layer) → Service (Business Logic Layer) → Repository (Data Access Layer) → Model (Data Model)`
+
+### Controller Layer
+
+```go
+// internal/controller/order/order.go
+package order
+
+import (
+    "net/http"
+    "strconv"
+    "github.com/gin-gonic/gin"
+    "github.com/gin-order/internal/model"
+    "github.com/gin-order/internal/service/order"
+    "github.com/gin-order/internal/pkg/response"
+)
+
+type OrderController struct {
+    service *order.OrderService
+}
+
+func NewOrderController(service *order.OrderService) *OrderController {
+    return &OrderController{service: service}
+}
+
+func (c *OrderController) GetOrder(ctx *gin.Context) {
+    idStr := ctx.Param("id")
+    id, _ := strconv.ParseUint(idStr, 10, 64)
+
+    order, err := c.service.GetOrderByID(uint(id))
+    if err != nil {
+        response.Error(ctx, http.StatusNotFound, "Order not found")
+        return
+    }
+
+    response.Success(ctx, order)
+}
+
+func (c *OrderController) CreateOrder(ctx *gin.Context) {
+    var req model.CreateOrderRequest
+    if err := ctx.ShouldBindJSON(&req); err != nil {
+        response.Error(ctx, http.StatusBadRequest, "Invalid request")
+        return
+    }
+
+    order, err := c.service.CreateOrder(&req)
+    if err != nil {
+        response.Error(ctx, http.StatusInternalServerError, "Failed to create order")
+        return
+    }
+
+    response.Success(ctx, order)
+}
+```
+
+### Service Layer
+
+```go
+// internal/service/order/order_service.go
+package order
+
+import (
+    "github.com/gin-order/internal/model"
+    "github.com/gin-order/internal/repository/order"
+)
+
+type OrderService struct {
+    repo *order.OrderRepository
+}
+
+func NewOrderService(repo *order.OrderRepository) *OrderService {
+    return &OrderService{repo: repo}
+}
+
+func (s *OrderService) GetOrderByID(id uint) (*model.Order, error) {
+    return s.repo.GetByID(id)
+}
+
+func (s *OrderService) CreateOrder(req *model.CreateOrderRequest) (*model.Order, error) {
+    order := &model.Order{
+        UserID: req.UserID,
+        Amount: req.Amount,
+        Status: "pending",
+    }
+    
+    return s.repo.Create(order)
+}
+```
+
+### Repository Layer
+
+```go
+// internal/repository/order/order_repository.go
+package order
+
+import (
+    "gorm.io/gorm"
+    "github.com/gin-order/internal/model"
+)
+
+type OrderRepository struct {
+    db *gorm.DB
+}
+
+func NewOrderRepository(db *gorm.DB) *OrderRepository {
+    return &OrderRepository{db: db}
+}
+
+func (r *OrderRepository) GetByID(id uint) (*model.Order, error) {
+    var order model.Order
+    err := r.db.First(&order, id).Error
+    return &order, err
+}
+
+func (r *OrderRepository) Create(order *model.Order) (*model.Order, error) {
+    err := r.db.Create(order).Error
+    return order, err
+}
+```
+
+### Model Layer
+
+```go
+// internal/model/order.go
+package model
+
+import "time"
+
+type Order struct {
+    ID        uint      `json:"id" gorm:"primarykey"`
+    UserID    uint      `json:"user_id"`
+    Amount    float64   `json:"amount"`
+    Status    string    `json:"status"`
+    CreatedAt time.Time `json:"created_at"`
+    UpdatedAt time.Time `json:"updated_at"`
+}
+
+type CreateOrderRequest struct {
+    UserID uint    `json:"user_id" binding:"required"`
+    Amount float64 `json:"amount" binding:"required,gt=0"`
+}
+```
+
+## Go Language DDD Code Implementation
+
+### Domain Layer
+
+```go
+// internal/domain/order/order.go
+package order
+
+import (
+    "errors"
+    "time"
+)
+
+// Order aggregate root
+type Order struct {
+    id        uint
+    userID    uint
+    amount    float64
+    status    OrderStatus
+    items     []OrderItem
+    createdAt time.Time
+    updatedAt time.Time
+}
+
+type OrderStatus string
+
+const (
+    StatusPending   OrderStatus = "pending"
+    StatusConfirmed OrderStatus = "confirmed"
+    StatusCancelled OrderStatus = "cancelled"
+)
+
+type OrderItem struct {
+    ProductID uint
+    Quantity  int
+    Price     float64
+}
+
+// Domain business logic methods
+func NewOrder(userID uint, items []OrderItem) (*Order, error) {
+    if len(items) == 0 {
+        return nil, errors.New("order must have at least one item")
+    }
+    
+    var total float64
+    for _, item := range items {
+        if item.Quantity <= 0 || item.Price <= 0 {
+            return nil, errors.New("invalid item quantity or price")
+        }
+        total += float64(item.Quantity) * item.Price
+    }
+    
+    return &Order{
+        userID:    userID,
+        amount:    total,
+        status:    StatusPending,
+        items:     items,
+        createdAt: time.Now(),
+        updatedAt: time.Now(),
+    }, nil
+}
+
+func (o *Order) Confirm() error {
+    if o.status != StatusPending {
+        return errors.New("only pending orders can be confirmed")
+    }
+    o.status = StatusConfirmed
+    o.updatedAt = time.Now()
+    return nil
+}
+
+func (o *Order) Cancel() error {
+    if o.status == StatusCancelled {
+        return errors.New("order is already cancelled")
+    }
+    o.status = StatusCancelled
+    o.updatedAt = time.Now()
+    return nil
+}
+
+// Getters
+func (o *Order) ID() uint { return o.id }
+func (o *Order) UserID() uint { return o.userID }
+func (o *Order) Amount() float64 { return o.amount }
+func (o *Order) Status() OrderStatus { return o.status }
+func (o *Order) Items() []OrderItem { return o.items }
+```
+
+### Repository Interface (Domain Layer)
+
+```go
+// internal/domain/repository/order_repository.go
+package repository
+
+import "github.com/go-web/internal/domain/order"
+
+type OrderRepository interface {
+    GetByID(id uint) (*order.Order, error)
+    Save(order *order.Order) error
+    Delete(id uint) error
+}
+```
+
+### Application Service
+
+```go
+// internal/application/services/order_service.go
+package services
+
+import (
+    "github.com/go-web/internal/domain/order"
+    "github.com/go-web/internal/domain/repository"
+)
+
+type OrderService struct {
+    orderRepo repository.OrderRepository
+}
+
+func NewOrderService(orderRepo repository.OrderRepository) *OrderService {
+    return &OrderService{orderRepo: orderRepo}
+}
+
+type CreateOrderRequest struct {
+    UserID uint              `json:"user_id"`
+    Items  []order.OrderItem `json:"items"`
+}
+
+func (s *OrderService) CreateOrder(req *CreateOrderRequest) (*order.Order, error) {
+    // Domain logic validation
+    order, err := order.NewOrder(req.UserID, req.Items)
+    if err != nil {
+        return nil, err
+    }
+    
+    // Save through repository
+    err = s.orderRepo.Save(order)
+    if err != nil {
+        return nil, err
+    }
+    
+    return order, nil
+}
+
+func (s *OrderService) ConfirmOrder(orderID uint) error {
+    order, err := s.orderRepo.GetByID(orderID)
+    if err != nil {
+        return err
+    }
+    
+    err = order.Confirm()
+    if err != nil {
+        return err
+    }
+    
+    return s.orderRepo.Save(order)
+}
+```
+
+### Infrastructure Implementation
+
+```go
+// internal/infrastructure/repository/order_repository_impl.go
+package repository
+
+import (
+    "gorm.io/gorm"
+    "github.com/go-web/internal/domain/order"
+    "github.com/go-web/internal/domain/repository"
+)
+
+type orderRepositoryImpl struct {
+    db *gorm.DB
+}
+
+func NewOrderRepository(db *gorm.DB) repository.OrderRepository {
+    return &orderRepositoryImpl{db: db}
+}
+
+// OrderPO - Persistent Object for database mapping
+type OrderPO struct {
+    ID        uint                `gorm:"primarykey"`
+    UserID    uint                `gorm:"column:user_id"`
+    Amount    float64             `gorm:"column:amount"`
+    Status    string              `gorm:"column:status"`
+    Items     []OrderItemPO       `gorm:"foreignKey:OrderID"`
+    CreatedAt time.Time           `gorm:"column:created_at"`
+    UpdatedAt time.Time           `gorm:"column:updated_at"`
+}
+
+type OrderItemPO struct {
+    ID        uint    `gorm:"primarykey"`
+    OrderID   uint    `gorm:"column:order_id"`
+    ProductID uint    `gorm:"column:product_id"`
+    Quantity  int     `gorm:"column:quantity"`
+    Price     float64 `gorm:"column:price"`
+}
+
+func (r *orderRepositoryImpl) GetByID(id uint) (*order.Order, error) {
+    var orderPO OrderPO
+    err := r.db.Preload("Items").First(&orderPO, id).Error
+    if err != nil {
+        return nil, err
+    }
+    
+    return r.toDomain(&orderPO), nil
+}
+
+func (r *orderRepositoryImpl) Save(order *order.Order) error {
+    orderPO := r.toPersistent(order)
+    return r.db.Save(orderPO).Error
+}
+
+func (r *orderRepositoryImpl) Delete(id uint) error {
+    return r.db.Delete(&OrderPO{}, id).Error
+}
+
+// Domain <-> Persistent Object conversion methods
+func (r *orderRepositoryImpl) toDomain(orderPO *OrderPO) *order.Order {
+    // Convert PO to domain object
+    // Implementation details...
+}
+
+func (r *orderRepositoryImpl) toPersistent(order *order.Order) *OrderPO {
+    // Convert domain object to PO
+    // Implementation details...
+}
+```
+
+### Interface Layer (HTTP Handlers)
+
+```go
+// internal/interfaces/handlers/order_handler.go
+package handlers
+
+import (
+    "net/http"
+    "strconv"
+    "github.com/gin-gonic/gin"
+    "github.com/go-web/internal/application/services"
+)
+
+type OrderHandler struct {
+    orderService *services.OrderService
+}
+
+func NewOrderHandler(orderService *services.OrderService) *OrderHandler {
+    return &OrderHandler{orderService: orderService}
+}
+
+func (h *OrderHandler) CreateOrder(c *gin.Context) {
+    var req services.CreateOrderRequest
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    
+    order, err := h.orderService.CreateOrder(&req)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    
+    c.JSON(http.StatusCreated, order)
+}
+
+func (h *OrderHandler) ConfirmOrder(c *gin.Context) {
+    idStr := c.Param("id")
+    id, err := strconv.ParseUint(idStr, 10, 64)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "invalid order id"})
+        return
+    }
+    
+    err = h.orderService.ConfirmOrder(uint(id))
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    
+    c.JSON(http.StatusOK, gin.H{"message": "order confirmed"})
+}
+```
+
+## DDD Best Practices in Go
+
+### Dependency Inversion
+
+The domain layer should not directly depend on the infrastructure layer; instead, it relies on interfaces for dependency inversion.
+
+> **Note**: The core of DDD architecture is dependency inversion (DIP). The Domain is the innermost core, defining only business rules and interface abstractions. Other layers depend on the Domain for implementation, but the Domain does not depend on any external implementations.
+
+```go
+// Domain layer: defines interface
+type UserRepository interface {
+    GetByID(id int) (*User, error)
+}
+```
+
+```go
+// Infrastructure layer: database implementation
+type userRepositoryImpl struct {
+    db *sql.DB
+}
+
+func (r *userRepositoryImpl) GetByID(id int) (*User, error) {
+    // Database query logic
+}
+```
+
+### Aggregate Management
+
+The aggregate root manages the lifecycle of the entire aggregate:
+
+```go
+type Order struct {
+    ID      int
+    Items   []OrderItem
+    Status  string
+}
+
+func (o *Order) AddItem(item OrderItem) {
+    o.Items = append(o.Items, item)
+}
+```
+
+### Application Service
+
+Application services encapsulate domain logic, preventing external layers from directly manipulating domain objects:
+
+```go
+type OrderService struct {
+    repo OrderRepository
+}
+
+func (s *OrderService) CreateOrder(userID int, items []OrderItem) (*Order, error) {
+    order := Order{UserID: userID, Items: items, Status: "Pending"}
+    return s.repo.Save(order)
+}
+```
+
+### Event-Driven Architecture
+
+Domain events are used for decoupling. In Go, you can implement this via Channels or Pub/Sub:
+
+```go
+type OrderCreatedEvent struct {
+    OrderID int
+}
+
+func publishEvent(event OrderCreatedEvent) {
+    go func() {
+        eventChannel <- event
+    }()
+}
+```
+
+### Combining CQRS (Command Query Responsibility Segregation)
+
+DDD can be combined with CQRS. In Go, you can use **Command** for change operations and **Query** for data reading:
+
+```go
+type CreateOrderCommand struct {
+    UserID int
+    Items  []OrderItem
+}
+
+func (h *OrderHandler) Handle(cmd CreateOrderCommand) (*Order, error) {
+    return h.service.CreateOrder(cmd.UserID, cmd.Items)
+}
+```
+
+## Summary: MVC vs. DDD Architecture
+
+### Core Differences in Architecture
+
+**MVC Architecture**
+- **Layers**: Three layers—Controller/Service/DAO
+- **Responsibilities**: 
+  - Controller handles requests, Service contains logic
+  - DAO directly operates the database
+- **Pain Points**: The Service layer becomes bloated, and business logic is coupled with data operations
+
+**DDD Architecture**
+- **Layers**: Four layers—Interface Layer / Application Layer / Domain Layer / Infrastructure Layer
+- **Responsibilities**: 
+  - Application Layer orchestrates processes (e.g., calls domain services)
+  - Domain Layer encapsulates business atomic operations (e.g., order creation rules)
+  - Infrastructure Layer implements technical details (e.g., database access)
+- **Benefits**: The domain layer is independent of technical implementations, and logic corresponds closely with the layer structure
+
+### Modularity and Scalability
+
+**MVC:**
+- **High Coupling**: Lacks clear business boundaries; cross-module calls (e.g., order service directly relying on account tables) make code hard to maintain.
+- **Poor Scalability**: Adding new features requires global changes (e.g., adding risk control rules must intrude into order service), easily causing cascading issues.
+
+**DDD:**
+- **Bounded Context**: Modules are divided by business capabilities (e.g., payment domain, risk control domain); event-driven collaboration (e.g., order payment completed event) is used for decoupling.
+- **Independent Evolution**: Each domain module can be upgraded independently (e.g., payment logic optimization does not affect order service), reducing system-level risks.
+
+### Applicable Scenarios
+
+- **Prefer MVC** for small to medium systems: Simple business (e.g., blogs, CMS, admin backends), requiring rapid development with clear business rules and no frequent changes.
+- **Prefer DDD** for complex business: Rule-intensive (e.g., financial transactions, supply chain), multi-domain collaboration (e.g., e-commerce order and inventory linkage), frequent changes in business requirements.
+
+## Conclusion
+
+Both MVC and DDD have their place in Go development. MVC offers simplicity and rapid development for straightforward applications, while DDD provides a robust framework for complex business domains that require long-term maintainability and scalability. The choice between them should be based on your project's complexity, team expertise, and long-term goals.
+
+---
+
+*References: This content is based on the comprehensive analysis from [Leapcell's MVC vs DDD article](https://dev.to/leapcell/mvc-vs-ddd-go-language-architecture-deep-dive-466f?ref=dailydev)*
