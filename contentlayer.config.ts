@@ -1,5 +1,5 @@
 import { defineDocumentType, ComputedFields, makeSource } from 'contentlayer/source-files'
-import { writeFileSync } from 'fs'
+import { writeFileSync, readFileSync } from 'fs'
 import readingTime from 'reading-time'
 import { slug } from 'github-slugger'
 import path from 'path'
@@ -40,6 +40,24 @@ const computedFields: ComputedFields = {
     resolve: (doc) => doc._raw.sourceFilePath,
   },
   toc: { type: 'string', resolve: (doc) => extractTocHeadings(doc.body.raw) },
+}
+
+/**
+ * Fix import assertions in generated contentlayer files
+ */
+function fixImportAssertions() {
+  try {
+    const indexPath = '.contentlayer/generated/index.mjs'
+    const content = readFileSync(indexPath, 'utf8')
+    const fixedContent = content.replace(/assert\s*{\s*type:\s*['"]json['"]\s*}/g, "with { type: 'json' }")
+    
+    if (content !== fixedContent) {
+      writeFileSync(indexPath, fixedContent, 'utf8')
+      console.log('Fixed import assertions in contentlayer generated files')
+    }
+  } catch (error) {
+    console.error('Error fixing import assertions:', error)
+  }
 }
 
 /**
@@ -134,7 +152,7 @@ export default makeSource({
   mdx: {
     cwd: process.cwd(),
     remarkPlugins: [
-      remarkExtractFrontmatter,
+      remarkExtractFrontmatter as any,
       remarkGfm,
       remarkCodeTitles,
       remarkMath,
@@ -150,8 +168,17 @@ export default makeSource({
     ],
   },
   onSuccess: async (importData) => {
-    const { allBlogs } = await importData()
-    createTagCount(allBlogs)
-    createSearchIndex(allBlogs)
+    try {
+      // Fix import assertions immediately after contentlayer generates files
+      fixImportAssertions()
+      
+      const { allBlogs } = await importData()
+      createTagCount(allBlogs)
+      createSearchIndex(allBlogs)
+      console.log('Contentlayer processing completed successfully')
+    } catch (error) {
+      console.error('Error in contentlayer onSuccess:', error)
+      // Don't throw to avoid breaking the build
+    }
   },
 })
