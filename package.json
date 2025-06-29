@@ -5,12 +5,13 @@
   "scripts": {
     "start": "next dev",
     "dev": "./scripts/fix-tags.sh && cross-env INIT_CWD=$PWD next dev",
-    "build": "cross-env INIT_CWD=$PWD next build && cross-env NODE_OPTIONS='--experimental-json-modules' node ./scripts/postbuild.mjs",
+    "build": "./scripts/fix-tags.sh && cross-env INIT_CWD=$PWD next build && cross-env NODE_OPTIONS='--experimental-json-modules' node ./scripts/postbuild.mjs",
     "serve": "next start",
     "analyze": "cross-env ANALYZE=true next build",
     "lint": "next lint --fix --dir pages --dir app --dir components --dir lib --dir layouts --dir scripts",
     "predev": "./scripts/fix-tags.sh",
-    "prebuild": "./scripts/fix-tags.sh"
+    "prebuild": "./scripts/fix-tags.sh",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@next/bundle-analyzer": "14.1.0",
@@ -55,6 +56,7 @@
     "eslint-plugin-prettier": "^5.0.0",
     "husky": "^8.0.0",
     "lint-staged": "^13.0.0",
+    "patch-package": "^8.0.0",
     "prettier": "^3.0.0",
     "prettier-plugin-tailwindcss": "^0.5.11",
     "typescript": "^5.1.3"
@@ -66,7 +68,9 @@
     "@opentelemetry/resources": "1.13.0",
     "@opentelemetry/sdk-trace-base": "1.13.0",
     "@opentelemetry/sdk-trace-node": "1.13.0",
-    "@opentelemetry/semantic-conventions": "1.13.0"
+    "@opentelemetry/semantic-conventions": "1.13.0",
+    "vfile": "^6.0.1",
+    "vfile-message": "^4.0.2"
   },
   "lint-staged": {
     "*.+(js|jsx|ts|tsx)": [
