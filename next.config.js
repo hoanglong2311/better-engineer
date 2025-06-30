@@ -65,7 +65,11 @@ module.exports = () => {
     eslint: {
       dirs: ['app', 'components', 'layouts', 'scripts'],
     },
+    // Static export configuration for Cloudflare Pages
+    output: 'export',
+    trailingSlash: true,
     images: {
+      unoptimized: true, // Required for static export
       remotePatterns: [
         {
           protocol: 'https',
@@ -73,6 +77,8 @@ module.exports = () => {
         },
       ],
     },
+    // Headers won't work in static export, but kept for reference
+    // Remove or comment out if you want cleaner config
     async headers() {
       return [
         {
