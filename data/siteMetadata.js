@@ -6,17 +6,17 @@ const siteMetadata = {
   description: 'A blog to share technical knowledge and lifestyle',
   language: 'en-us',
   theme: 'system', // system, dark or light
-  siteUrl: 'https://tailwind-nextjs-starter-blog.vercel.app',
-  siteRepo: 'https://github.com/timlrx/tailwind-nextjs-starter-blog',
+  siteUrl: 'https://longnguyen.engineer',
+  siteRepo: 'https://github.com/longnguyenhoang/better-engineer',
   siteLogo: '/static/images/logo.png',
   socialBanner: '/static/images/twitter-card.png',
   mastodon: 'https://mastodon.social/@mastodonuser',
-  email: 'address@yoursite.com',
-  github: 'https://github.com',
-  twitter: 'https://twitter.com/Twitter',
-  facebook: 'https://facebook.com',
-  youtube: 'https://youtube.com',
-  linkedin: 'https://www.linkedin.com',
+  email: 'hello@longnguyen.engineer',
+  github: 'https://github.com/longnguyenhoang',
+  twitter: 'https://twitter.com/longnguyenhoang',
+  facebook: 'https://facebook.com/longnguyenhoang',
+  youtube: 'https://youtube.com/@longnguyenhoang',
+  linkedin: 'https://www.linkedin.com/in/longnguyenhoang',
   threads: 'https://www.threads.net',
   instagram: 'https://www.instagram.com',
   locale: 'en-US',
@@ -38,9 +38,9 @@ const siteMetadata = {
     // posthogAnalytics: {
     //   posthogProjectApiKey: '', // e.g. 123e4567-e89b-12d3-a456-426614174000
     // },
-    // googleAnalytics: {
-    //   googleAnalyticsId: '', // e.g. G-XXXXXXX
-    // },
+    googleAnalytics: {
+      googleAnalyticsId: process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID || '', // Add your G-XXXXXXX ID
+    },
   },
   newsletter: {
     // supports mailchimp, buttondown, convertkit, klaviyo, revue, emailoctopus

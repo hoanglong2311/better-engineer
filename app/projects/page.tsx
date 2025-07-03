@@ -2,7 +2,22 @@ import projectsData from '@/data/projectsData'
 import Card from '@/components/Card'
 import { genPageMetadata } from 'app/seo'
 
-export const metadata = genPageMetadata({ title: 'Projects' })
+export const metadata = genPageMetadata({
+  title: 'Projects - Software Engineering Portfolio',
+  description:
+    "Explore Long Nguyen's software engineering projects including backend systems, APIs, microservices, and open-source contributions. See real-world implementations of scalable architecture.",
+  keywords: [
+    'software projects',
+    'backend projects',
+    'Go projects',
+    'API development',
+    'microservices examples',
+    'system architecture',
+    'open source',
+    'portfolio',
+    'code examples',
+  ],
+})
 
 export default function Projects() {
   return (
