@@ -5,9 +5,10 @@ import { genPageMetadata } from 'app/seo'
 
 const POSTS_PER_PAGE = 5
 
-export const metadata = genPageMetadata({ 
+export const metadata = genPageMetadata({
   title: 'Blog - Software Engineering Articles & Tutorials',
-  description: 'Read in-depth articles about backend development, system architecture, Go programming, microservices, and software engineering best practices. Stay updated with the latest tech trends and practical tutorials.',
+  description:
+    'Read in-depth articles about backend development, system architecture, Go programming, microservices, and software engineering best practices. Stay updated with the latest tech trends and practical tutorials.',
   keywords: [
     'software engineering blog',
     'backend development articles',

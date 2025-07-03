@@ -4,9 +4,10 @@ import AuthorLayout from '@/layouts/AuthorLayout'
 import { coreContent } from 'pliny/utils/contentlayer'
 import { genPageMetadata } from 'app/seo'
 
-export const metadata = genPageMetadata({ 
+export const metadata = genPageMetadata({
   title: 'About Long Nguyen - Backend Software Engineer',
-  description: 'Learn about Long Nguyen, a passionate backend software engineer specializing in scalable systems, Go programming, microservices architecture, and modern development practices.',
+  description:
+    'Learn about Long Nguyen, a passionate backend software engineer specializing in scalable systems, Go programming, microservices architecture, and modern development practices.',
   keywords: [
     'Long Nguyen',
     'software engineer',

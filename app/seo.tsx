@@ -15,17 +15,17 @@ interface PageSEOProps {
   [key: string]: any
 }
 
-export function genPageMetadata({ 
-  title, 
-  description, 
-  image, 
+export function genPageMetadata({
+  title,
+  description,
+  image,
   keywords,
   author,
   publishedTime,
   modifiedTime,
   url,
   type = 'website',
-  ...rest 
+  ...rest
 }: PageSEOProps): Metadata {
   const pageTitle = title.includes(siteMetadata.title) ? title : `${title} | ${siteMetadata.title}`
   const pageDescription = description || siteMetadata.description
@@ -35,7 +35,12 @@ export function genPageMetadata({
   return {
     title: pageTitle,
     description: pageDescription,
-    keywords: keywords || ['software engineering', 'backend development', 'programming', 'technical blog'],
+    keywords: keywords || [
+      'software engineering',
+      'backend development',
+      'programming',
+      'technical blog',
+    ],
     authors: [{ name: author || siteMetadata.author }],
     creator: siteMetadata.author,
     publisher: siteMetadata.author,
@@ -58,13 +63,14 @@ export function genPageMetadata({
       images: pageImage,
       locale: 'en_US',
       type: type,
-      ...(type === 'article' && publishedTime && {
-        publishedTime,
-        ...(modifiedTime && { modifiedTime }),
-        authors: [author || siteMetadata.author],
-        section: 'Technology',
-        tags: keywords,
-      }),
+      ...(type === 'article' &&
+        publishedTime && {
+          publishedTime,
+          ...(modifiedTime && { modifiedTime }),
+          authors: [author || siteMetadata.author],
+          section: 'Technology',
+          tags: keywords,
+        }),
     },
     twitter: {
       title: pageTitle,
@@ -102,7 +108,7 @@ export function genBlogPostMetadata({
   author?: string
 }): Metadata {
   const url = `${siteMetadata.siteUrl}/blog/${slug}`
-  
+
   return genPageMetadata({
     title,
     description,

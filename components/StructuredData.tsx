@@ -104,13 +104,10 @@ export function PersonStructuredData() {
     name: siteMetadata.author,
     url: siteMetadata.siteUrl,
     ...(siteMetadata.email && { email: siteMetadata.email }),
-    sameAs: [
-      siteMetadata.github,
-      siteMetadata.linkedin,
-      siteMetadata.twitter,
-    ].filter(Boolean),
+    sameAs: [siteMetadata.github, siteMetadata.linkedin, siteMetadata.twitter].filter(Boolean),
     jobTitle: 'Software Engineer',
-    description: 'Backend Software Engineer specializing in scalable systems and modern architecture',
+    description:
+      'Backend Software Engineer specializing in scalable systems and modern architecture',
     knowsAbout: [
       'Software Engineering',
       'Backend Development',
@@ -142,11 +139,7 @@ export function OrganizationStructuredData() {
       '@type': 'Person',
       name: siteMetadata.author,
     },
-    sameAs: [
-      siteMetadata.github,
-      siteMetadata.linkedin,
-      siteMetadata.twitter,
-    ].filter(Boolean),
+    sameAs: [siteMetadata.github, siteMetadata.linkedin, siteMetadata.twitter].filter(Boolean),
   }
 
   return (
@@ -155,4 +148,4 @@ export function OrganizationStructuredData() {
       dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
     />
   )
-} 
+}

@@ -5,7 +5,8 @@ import { genPageMetadata } from './seo'
 
 export const metadata = genPageMetadata({
   title: 'Better Engineer - Technical Blog & Software Development Insights',
-  description: 'Explore backend software engineering, system architecture, Go programming, microservices, and modern development practices. Learn from real-world experience in building scalable systems.',
+  description:
+    'Explore backend software engineering, system architecture, Go programming, microservices, and modern development practices. Learn from real-world experience in building scalable systems.',
   keywords: [
     'software engineering',
     'backend development',
